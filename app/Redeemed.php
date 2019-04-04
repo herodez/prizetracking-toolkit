@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Redeemed extends Model
 {
     protected $table = 'redeemed';
+    public $timestamps = false;
     
     /**
      * Get the user that owns the Redeemed.
