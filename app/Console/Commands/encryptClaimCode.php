@@ -58,14 +58,17 @@ class encryptClaimCode extends Command
      */
     private function encryptRedeemedClaimCode()
     {
-        $totalRedeems = Redeemed::where('claim_code', '!=', '')->where('decrypt_parameters', '')->count();
+        $totalRedeems = Redeemed::whereNotNull('claim_code')
+            ->whereNull('decrypt_parameters')
+            ->count();
         $batchSize = 100;
         $bar = $this->output->createProgressBar($totalRedeems);
         
         $this->info('Starting claim codes encryption on ' . Redeemed::class);
         $bar->start();
         while ($totalRedeems > 0) {
-            Redeemed::where('claim_code', '!=', '')->where('decrypt_parameters', '')->chunk($batchSize,
+            Redeemed::whereNotNull('claim_code')
+                ->whereNull('decrypt_parameters')->chunk($batchSize,
                 static function ($redeems) use ($bar) {
                     foreach ($redeems as $redeem) {
                         $dataEncrypt = DataEncryption::encrypt($redeem->claim_code,
@@ -90,15 +93,18 @@ class encryptClaimCode extends Command
     private function encryptRedemtionAttributesClaimCode()
     {
         $totalRedemption = RedemptionAttribute::where('name',
-            RedemptionAttribute::NAME_CLAIM_CODE)->where('decrypt_parameters', '')->count();
+            RedemptionAttribute::NAME_CLAIM_CODE)
+            ->whereNull('decrypt_parameters')
+            ->count();
         $batchSize = 100;
         $bar = $this->output->createProgressBar($totalRedemption);
         
         $this->info('Starting claim codes encryption on ' . RedemptionAttribute::class);
         $bar->start();
         while ($totalRedemption > 0) {
-            RedemptionAttribute::where('name', RedemptionAttribute::NAME_CLAIM_CODE)->where('decrypt_parameters',
-                '')->chunk($batchSize,
+            RedemptionAttribute::where('name', RedemptionAttribute::NAME_CLAIM_CODE)
+                ->whereNull('decrypt_parameters')
+                ->chunk($batchSize,
                 static function ($redeems) use ($bar) {
                     foreach ($redeems as $redeem) {
                         $dataEncrypt = DataEncryption::encrypt($redeem->value,
